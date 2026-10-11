@@ -1,13 +1,14 @@
 import { RegisterForm } from '@/features/auth/components/register-form'
+import { useI18n } from '@/hooks/use-i18n'
 
 export function RegisterPage() {
+  const { t } = useI18n()
+
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">注册</h1>
-        <p className="text-muted-foreground text-sm">
-          创建账号后将自动登录进入系统
-        </p>
+        <h1 className="text-xl font-semibold">{t('auth.register')}</h1>
+        <p className="text-muted-foreground text-sm">{t('auth.registerHint')}</p>
       </div>
       <RegisterForm />
     </div>

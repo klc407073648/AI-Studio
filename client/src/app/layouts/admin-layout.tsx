@@ -2,10 +2,18 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Search,
+  Settings,
   Users,
+  type LucideIcon,
 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router'
 
+import { AppBreadcrumb } from '@/components/app-breadcrumb'
+import { CommandMenu } from '@/components/command-menu'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,22 +26,32 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useI18n } from '@/hooks/use-i18n'
 import { queryClient } from '@/lib/query-client'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUiStore } from '@/stores/ui-store'
 
-const navItems = [
-  { to: '/', label: '仪表盘', icon: LayoutDashboard, end: true },
-  { to: '/users', label: '用户管理', icon: Users, end: false, adminOnly: true },
-]
+type NavItem = {
+  to: string
+  label: string
+  icon: LucideIcon
+  end: boolean
+  adminOnly?: boolean
+}
 
-function NavItems({ onNavigate }: { onNavigate?: () => void }) {
+function NavItems({
+  items,
+  onNavigate,
+}: {
+  items: NavItem[]
+  onNavigate?: () => void
+}) {
   const role = useAuthStore((state) => state.user?.role)
 
   return (
     <nav className="flex flex-col gap-1 p-3">
-      {navItems
+      {items
         .filter((item) => !item.adminOnly || role === 'admin')
         .map((item) => (
           <NavLink
@@ -60,10 +78,43 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminLayout() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const user = useAuthStore((state) => state.user)
   const clearSession = useAuthStore((state) => state.clearSession)
   const sidebarOpen = useUiStore((state) => state.sidebarOpen)
   const setSidebarOpen = useUiStore((state) => state.setSidebarOpen)
+  const [commandOpen, setCommandOpen] = useState(false)
+
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { to: '/', label: t('nav.dashboard'), icon: LayoutDashboard, end: true },
+      {
+        to: '/users',
+        label: t('nav.users'),
+        icon: Users,
+        end: false,
+        adminOnly: true,
+      },
+      {
+        to: '/settings',
+        label: t('nav.settings'),
+        icon: Settings,
+        end: false,
+      },
+    ],
+    [t],
+  )
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setCommandOpen((open) => !open)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   function handleLogout() {
     clearSession()
@@ -72,6 +123,11 @@ export function AdminLayout() {
   }
 
   const initials = (user?.name ?? 'U').slice(0, 1).toUpperCase()
+  const searchHint =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+      ? '⌘K'
+      : 'Ctrl K'
 
   return (
     <div className="bg-background flex min-h-screen">
@@ -82,29 +138,29 @@ export function AdminLayout() {
         )}
       >
         <div className="px-4 py-5">
-          <p className="text-lg font-semibold tracking-tight">Admin Console</p>
-          <p className="text-muted-foreground text-xs">内部管理系统</p>
+          <p className="text-lg font-semibold tracking-tight">{t('app.name')}</p>
+          <p className="text-muted-foreground text-xs">{t('app.subtitle')}</p>
         </div>
         <Separator />
-        <NavItems />
+        <NavItems items={navItems} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-card/80 sticky top-0 z-10 flex h-14 items-center justify-between border-b px-4 backdrop-blur">
-          <div className="flex items-center gap-2">
+        <header className="bg-card/80 sticky top-0 z-10 flex h-14 items-center justify-between gap-3 border-b px-4 backdrop-blur">
+          <div className="flex min-w-0 items-center gap-2">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <Menu className="size-4" />
-                  <span className="sr-only">打开菜单</span>
+                  <span className="sr-only">{t('header.openMenu')}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
                 <div className="px-4 py-5">
-                  <p className="text-lg font-semibold">Admin Console</p>
+                  <p className="text-lg font-semibold">{t('app.name')}</p>
                 </div>
                 <Separator />
-                <NavItems />
+                <NavItems items={navItems} />
               </SheetContent>
             </Sheet>
             <Button
@@ -114,42 +170,80 @@ export function AdminLayout() {
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <Menu className="size-4" />
-              <span className="sr-only">切换侧栏</span>
+              <span className="sr-only">{t('header.toggleSidebar')}</span>
             </Button>
-            <p className="text-sm font-medium">管理后台</p>
+            <div className="min-w-0">
+              <p className="text-sm font-medium">{t('app.backend')}</p>
+              <div className="hidden sm:block">
+                <AppBreadcrumb />
+              </div>
+            </div>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2">
-                <Avatar className="size-7">
-                  <AvatarFallback>{initials}</AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:inline">{user?.name}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span>{user?.name}</span>
-                  <span className="text-muted-foreground text-xs font-normal">
-                    {user?.email}
-                  </span>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="size-4" />
-                退出登录
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="outline"
+              className="text-muted-foreground hidden h-9 w-48 justify-start gap-2 px-3 font-normal lg:inline-flex"
+              onClick={() => setCommandOpen(true)}
+            >
+              <Search className="size-4" />
+              <span className="flex-1 text-left">{t('header.search')}</span>
+              <kbd className="bg-muted pointer-events-none rounded border px-1.5 py-0.5 text-[10px] font-medium">
+                {searchHint}
+              </kbd>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setCommandOpen(true)}
+              aria-label={t('header.search')}
+            >
+              <Search className="size-4" />
+            </Button>
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2 px-2">
+                  <Avatar className="size-7">
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline">{user?.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span>{user?.name}</span>
+                    <span className="text-muted-foreground text-xs font-normal">
+                      {user?.email}
+                    </span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="size-4" />
+                  {t('nav.settings')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="size-4" />
+                  {t('header.logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
 
         <main className="flex-1 p-4 md:p-6">
+          <div className="mb-4 sm:hidden">
+            <AppBreadcrumb />
+          </div>
           <Outlet />
         </main>
       </div>
+
+      <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
     </div>
   )
 }

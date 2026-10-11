@@ -9,6 +9,7 @@ import { DashboardPage } from '@/pages/dashboard'
 import { ForbiddenPage } from '@/pages/forbidden'
 import { LoginPage } from '@/pages/login'
 import { RegisterPage } from '@/pages/register'
+import { SettingsPage } from '@/pages/settings'
 import { UsersPage } from '@/pages/users'
 
 export const router = createBrowserRouter([
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { path: '/', element: <DashboardPage /> },
+          { path: '/settings', element: <SettingsPage /> },
           { path: '/403', element: <ForbiddenPage /> },
           {
             element: <RequireAdmin />,

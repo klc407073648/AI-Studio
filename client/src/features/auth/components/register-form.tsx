@@ -19,11 +19,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiError } from '@/lib/api-client'
 import { useAuthStore } from '@/stores/auth-store'
 
 export function RegisterForm() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const setSession = useAuthStore((state) => state.setSession)
   const [submitting, setSubmitting] = useState(false)
 
@@ -46,11 +48,11 @@ export function RegisterForm() {
         password: values.password,
       })
       setSession(session)
-      toast.success('注册成功')
+      toast.success(t('auth.registerSuccess'))
       navigate('/', { replace: true })
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : '注册失败，请稍后重试'
+        error instanceof ApiError ? error.message : t('common.actionFailed')
       toast.error(message)
     } finally {
       setSubmitting(false)
@@ -65,9 +67,9 @@ export function RegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>姓名</FormLabel>
+              <FormLabel>{t('auth.name')}</FormLabel>
               <FormControl>
-                <Input placeholder="张三" {...field} />
+                <Input placeholder={t('auth.name')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,7 +80,7 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>邮箱</FormLabel>
+              <FormLabel>{t('auth.email')}</FormLabel>
               <FormControl>
                 <Input type="email" placeholder="you@example.com" {...field} />
               </FormControl>
@@ -91,9 +93,9 @@ export function RegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>密码</FormLabel>
+              <FormLabel>{t('auth.password')}</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="至少 6 位" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,21 +106,21 @@ export function RegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>确认密码</FormLabel>
+              <FormLabel>{t('auth.confirmPassword')}</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="再次输入密码" {...field} />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? '注册中…' : '注册'}
+          {submitting ? t('auth.registering') : t('auth.register')}
         </Button>
         <p className="text-muted-foreground text-center text-sm">
-          已有账号？{' '}
+          {t('auth.hasAccount')}{' '}
           <Link to="/login" className="text-primary underline-offset-4 hover:underline">
-            去登录
+            {t('auth.goLogin')}
           </Link>
         </p>
       </form>

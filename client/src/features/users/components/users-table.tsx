@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiError } from '@/lib/api-client'
 import type { User } from '@/types/user'
 
@@ -20,6 +21,7 @@ type UsersTableProps = {
 }
 
 export function UsersTable({ users, onEdit }: UsersTableProps) {
+  const { t } = useI18n()
   const updateMutation = useUpdateUserMutation()
 
   async function toggleStatus(user: User) {
@@ -34,10 +36,14 @@ export function UsersTable({ users, onEdit }: UsersTableProps) {
           status: nextStatus,
         },
       })
-      toast.success(nextStatus === 'active' ? '已启用用户' : '已禁用用户')
+      toast.success(
+        nextStatus === 'active'
+          ? t('users.enabledToast')
+          : t('users.disabledToast'),
+      )
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : '操作失败，请稍后重试'
+        error instanceof ApiError ? error.message : t('common.actionFailed')
       toast.error(message)
     }
   }
@@ -45,7 +51,7 @@ export function UsersTable({ users, onEdit }: UsersTableProps) {
   if (users.length === 0) {
     return (
       <div className="text-muted-foreground rounded-lg border border-dashed p-10 text-center text-sm">
-        暂无用户数据
+        {t('users.empty')}
       </div>
     )
   }
@@ -55,11 +61,11 @@ export function UsersTable({ users, onEdit }: UsersTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>姓名</TableHead>
-            <TableHead>邮箱</TableHead>
-            <TableHead>角色</TableHead>
-            <TableHead>状态</TableHead>
-            <TableHead className="text-right">操作</TableHead>
+            <TableHead>{t('users.name')}</TableHead>
+            <TableHead>{t('users.email')}</TableHead>
+            <TableHead>{t('users.role')}</TableHead>
+            <TableHead>{t('users.status')}</TableHead>
+            <TableHead className="text-right">{t('users.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,16 +74,18 @@ export function UsersTable({ users, onEdit }: UsersTableProps) {
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                {user.role === 'admin' ? '管理员' : '普通用户'}
+                {user.role === 'admin' ? t('role.admin') : t('role.user')}
               </TableCell>
               <TableCell>
                 <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
-                  {user.status === 'active' ? '启用' : '禁用'}
+                  {user.status === 'active'
+                    ? t('status.active')
+                    : t('status.disabled')}
                 </Badge>
               </TableCell>
               <TableCell className="space-x-2 text-right">
                 <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
-                  编辑
+                  {t('users.edit')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -85,7 +93,9 @@ export function UsersTable({ users, onEdit }: UsersTableProps) {
                   disabled={updateMutation.isPending}
                   onClick={() => void toggleStatus(user)}
                 >
-                  {user.status === 'active' ? '禁用' : '启用'}
+                  {user.status === 'active'
+                    ? t('users.disable')
+                    : t('users.enable')}
                 </Button>
               </TableCell>
             </TableRow>

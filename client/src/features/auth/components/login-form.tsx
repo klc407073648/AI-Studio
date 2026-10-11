@@ -19,11 +19,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiError } from '@/lib/api-client'
 import { useAuthStore } from '@/stores/auth-store'
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const { t } = useI18n()
   const setSession = useAuthStore((state) => state.setSession)
   const [submitting, setSubmitting] = useState(false)
 
@@ -40,11 +42,11 @@ export function LoginForm() {
     try {
       const session = await login(values)
       setSession(session)
-      toast.success('登录成功')
+      toast.success(t('auth.loginSuccess'))
       navigate('/', { replace: true })
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : '登录失败，请稍后重试'
+        error instanceof ApiError ? error.message : t('common.actionFailed')
       toast.error(message)
     } finally {
       setSubmitting(false)
@@ -59,7 +61,7 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>邮箱</FormLabel>
+              <FormLabel>{t('auth.email')}</FormLabel>
               <FormControl>
                 <Input type="email" placeholder="you@example.com" {...field} />
               </FormControl>
@@ -72,7 +74,7 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>密码</FormLabel>
+              <FormLabel>{t('auth.password')}</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
@@ -81,12 +83,12 @@ export function LoginForm() {
           )}
         />
         <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? '登录中…' : '登录'}
+          {submitting ? t('auth.loggingIn') : t('auth.login')}
         </Button>
         <p className="text-muted-foreground text-center text-sm">
-          还没有账号？{' '}
+          {t('auth.noAccount')}{' '}
           <Link to="/register" className="text-primary underline-offset-4 hover:underline">
-            去注册
+            {t('auth.goRegister')}
           </Link>
         </p>
       </form>

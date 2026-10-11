@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useI18n } from '@/hooks/use-i18n'
 import { ApiError } from '@/lib/api-client'
 import type { User } from '@/types/user'
 
@@ -49,6 +50,7 @@ export function UserFormDialog({
   onOpenChange,
   user,
 }: UserFormDialogProps) {
+  const { t } = useI18n()
   const isEdit = Boolean(user)
   const createMutation = useCreateUserMutation()
   const updateMutation = useUpdateUserMutation()
@@ -98,7 +100,7 @@ export function UserFormDialog({
             password: values.password || undefined,
           },
         })
-        toast.success('用户已更新')
+        toast.success(t('users.updated'))
       } else {
         await createMutation.mutateAsync({
           name: values.name,
@@ -107,12 +109,12 @@ export function UserFormDialog({
           role: values.role,
           status: values.status,
         })
-        toast.success('用户已创建')
+        toast.success(t('users.created'))
       }
       onOpenChange(false)
     } catch (error) {
       const message =
-        error instanceof ApiError ? error.message : '保存失败，请稍后重试'
+        error instanceof ApiError ? error.message : t('common.saveFailed')
       toast.error(message)
     }
   }
@@ -123,7 +125,9 @@ export function UserFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? '编辑用户' : '新建用户'}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t('users.editTitle') : t('users.createTitle')}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -132,9 +136,9 @@ export function UserFormDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>姓名</FormLabel>
+                  <FormLabel>{t('users.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="姓名" {...field} />
+                    <Input placeholder={t('users.name')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +149,7 @@ export function UserFormDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>邮箱</FormLabel>
+                  <FormLabel>{t('users.email')}</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="email@example.com" {...field} />
                   </FormControl>
@@ -158,9 +162,13 @@ export function UserFormDialog({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{isEdit ? '密码（留空则不修改）' : '初始密码'}</FormLabel>
+                  <FormLabel>
+                    {isEdit
+                      ? t('users.passwordOptional')
+                      : t('users.passwordInitial')}
+                  </FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="至少 6 位" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -172,16 +180,16 @@ export function UserFormDialog({
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>角色</FormLabel>
+                    <FormLabel>{t('users.role')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="选择角色" />
+                          <SelectValue placeholder={t('users.selectRole')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="admin">管理员</SelectItem>
-                        <SelectItem value="user">普通用户</SelectItem>
+                        <SelectItem value="admin">{t('role.admin')}</SelectItem>
+                        <SelectItem value="user">{t('role.user')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -193,16 +201,18 @@ export function UserFormDialog({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>状态</FormLabel>
+                    <FormLabel>{t('users.status')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="选择状态" />
+                          <SelectValue placeholder={t('users.selectStatus')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">启用</SelectItem>
-                        <SelectItem value="disabled">禁用</SelectItem>
+                        <SelectItem value="active">{t('status.active')}</SelectItem>
+                        <SelectItem value="disabled">
+                          {t('status.disabled')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -217,10 +227,10 @@ export function UserFormDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={busy}
               >
-                取消
+                {t('users.cancel')}
               </Button>
               <Button type="submit" disabled={busy}>
-                {busy ? '保存中…' : '保存'}
+                {busy ? t('users.saving') : t('users.save')}
               </Button>
             </DialogFooter>
           </form>

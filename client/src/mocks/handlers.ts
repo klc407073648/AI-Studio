@@ -103,6 +103,70 @@ export const handlers = [
     return HttpResponse.json(result.user)
   }),
 
+  http.patch('/api/auth/profile', async ({ request }) => {
+    const result = requireAuth(request)
+    if ('error' in result) return result.error
+
+    const body = (await request.json()) as { name?: string; email?: string }
+    const name = body.name?.trim() ?? ''
+    const email = body.email?.trim().toLowerCase() ?? ''
+
+    if (!name || name.length < 2) {
+      return HttpResponse.json({ message: '姓名至少 2 个字符' }, { status: 400 })
+    }
+    if (!email) {
+      return HttpResponse.json({ message: '请输入有效邮箱' }, { status: 400 })
+    }
+    if (usersDb.some((user) => user.email === email && user.id !== result.user.id)) {
+      return HttpResponse.json({ message: '邮箱已存在' }, { status: 409 })
+    }
+
+    const index = usersDb.findIndex((user) => user.id === result.user.id)
+    if (index < 0) {
+      return HttpResponse.json({ message: '用户不存在' }, { status: 404 })
+    }
+
+    const current = usersDb[index]
+    const updated: User = {
+      ...current,
+      name,
+      email,
+    }
+    usersDb[index] = updated
+
+    if (current.email !== email) {
+      passwordsDb[email] = passwordsDb[current.email]
+      delete passwordsDb[current.email]
+    }
+
+    return HttpResponse.json(updated)
+  }),
+
+  http.patch('/api/auth/password', async ({ request }) => {
+    const result = requireAuth(request)
+    if ('error' in result) return result.error
+
+    const body = (await request.json()) as {
+      currentPassword?: string
+      newPassword?: string
+    }
+    const currentPassword = body.currentPassword ?? ''
+    const newPassword = body.newPassword ?? ''
+
+    if (!currentPassword || !newPassword) {
+      return HttpResponse.json({ message: '请填写完整密码信息' }, { status: 400 })
+    }
+    if (newPassword.length < 6) {
+      return HttpResponse.json({ message: '密码至少 6 位' }, { status: 400 })
+    }
+    if (passwordsDb[result.user.email] !== currentPassword) {
+      return HttpResponse.json({ message: '当前密码不正确' }, { status: 400 })
+    }
+
+    passwordsDb[result.user.email] = newPassword
+    return HttpResponse.json({ ok: true })
+  }),
+
   http.get('/api/users', ({ request }) => {
     const result = requireAdmin(request)
     if ('error' in result) return result.error

@@ -7,15 +7,23 @@ import { useUsersQuery } from '@/features/users/hooks'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useI18n } from '@/hooks/use-i18n'
 import type { User } from '@/types/user'
 
 export function UsersPage() {
+  const { t } = useI18n()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Number(searchParams.get('page') ?? '1')
   const q = searchParams.get('q') ?? ''
   const [keyword, setKeyword] = useState(q)
+  const [prevQ, setPrevQ] = useState(q)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+
+  if (q !== prevQ) {
+    setPrevQ(q)
+    setKeyword(q)
+  }
 
   const query = useMemo(
     () => ({
@@ -56,23 +64,25 @@ export function UsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">用户管理</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t('users.title')}
+          </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            查看、创建、编辑用户，并启用或禁用账号
+            {t('users.subtitle')}
           </p>
         </div>
-        <Button onClick={openCreate}>新建用户</Button>
+        <Button onClick={openCreate}>{t('users.create')}</Button>
       </div>
 
       <form onSubmit={applySearch} className="flex flex-col gap-2 sm:flex-row">
         <Input
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
-          placeholder="按姓名或邮箱搜索"
+          placeholder={t('users.searchPlaceholder')}
           className="sm:max-w-sm"
         />
         <Button type="submit" variant="secondary">
-          搜索
+          {t('users.search')}
         </Button>
       </form>
 
@@ -85,10 +95,10 @@ export function UsersPage() {
       ) : isError ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-sm text-destructive">
-            {(error as Error)?.message ?? '加载失败'}
+            {(error as Error)?.message ?? t('users.loadFailed')}
           </p>
           <Button className="mt-3" variant="outline" onClick={() => void refetch()}>
-            重试
+            {t('users.retry')}
           </Button>
         </div>
       ) : (
@@ -96,8 +106,8 @@ export function UsersPage() {
           <UsersTable users={data?.items ?? []} onEdit={openEdit} />
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground text-sm">
-              共 {data?.total ?? 0} 条
-              {isFetching ? ' · 刷新中…' : ''}
+              {t('users.total', { total: data?.total ?? 0 })}
+              {isFetching ? ` · ${t('users.refreshing')}` : ''}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -110,7 +120,7 @@ export function UsersPage() {
                   setSearchParams(next)
                 }}
               >
-                上一页
+                {t('users.prev')}
               </Button>
               <span className="text-sm">
                 {query.page} / {totalPages}
@@ -125,7 +135,7 @@ export function UsersPage() {
                   setSearchParams(next)
                 }}
               >
-                下一页
+                {t('users.next')}
               </Button>
             </div>
           </div>

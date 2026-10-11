@@ -8,48 +8,65 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useI18n } from '@/hooks/use-i18n'
 import { useAuthStore } from '@/stores/auth-store'
 
 export function DashboardPage() {
   const user = useAuthStore((state) => state.user)
+  const { t } = useI18n()
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">仪表盘</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {t('dashboard.title')}
+        </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          欢迎回来，{user?.name}
+          {t('dashboard.welcome', { name: user?.name ?? '' })}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>当前账号</CardTitle>
-            <CardDescription>会话信息来自 Zustand 持久化存储</CardDescription>
+            <CardTitle>{t('dashboard.account')}</CardTitle>
+            <CardDescription>{t('dashboard.accountDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <p>邮箱：{user?.email}</p>
-            <p>角色：{user?.role === 'admin' ? '管理员' : '普通用户'}</p>
-            <p>状态：{user?.status === 'active' ? '启用' : '禁用'}</p>
+            <p>
+              {t('dashboard.email')}：{user?.email}
+            </p>
+            <p>
+              {t('dashboard.role')}：
+              {user?.role === 'admin' ? t('role.admin') : t('role.user')}
+            </p>
+            <p>
+              {t('dashboard.status')}：
+              {user?.status === 'active'
+                ? t('status.active')
+                : t('status.disabled')}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>快捷入口</CardTitle>
-            <CardDescription>进入常用管理功能</CardDescription>
+            <CardTitle>{t('dashboard.quickLinks')}</CardTitle>
+            <CardDescription>{t('dashboard.quickLinksDesc')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-wrap gap-2">
             {user?.role === 'admin' ? (
               <Button asChild>
-                <Link to="/users">用户管理</Link>
+                <Link to="/users">{t('nav.users')}</Link>
               </Button>
             ) : (
               <p className="text-muted-foreground text-sm">
-                普通用户暂无管理入口，请联系管理员提升权限。
+                {t('dashboard.noAdminAccess')}
               </p>
             )}
+            <Button asChild variant="outline">
+              <Link to="/settings">{t('nav.settings')}</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
