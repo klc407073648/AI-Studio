@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Settings,
   SquareTerminal,
+  Terminal,
   Users,
   Waypoints,
 } from 'lucide-react'
@@ -94,6 +95,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           to: '/interfaces',
           label: t('nav.interfaces'),
           icon: Waypoints,
+        },
+        {
+          to: '/terminal',
+          label: t('nav.terminal'),
+          icon: Terminal,
         },
         ...(isAdmin
           ? [

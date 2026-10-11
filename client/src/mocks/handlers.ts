@@ -530,5 +530,146 @@ export const handlers = [
 
     return HttpResponse.json(items)
   }),
+
+  // terminal mock APIs (weather / fanyi / music)
+  http.post('/api/terminal/weather/now', async ({ request }) => {
+    const body = (await request.json()) as { city?: string }
+    const city = body.city?.trim() || '北京'
+    return HttpResponse.json({
+      code: 0,
+      data: JSON.stringify({
+        lives: [
+          {
+            province: '模拟省',
+            city,
+            weather: '晴',
+            temperature: '26',
+            winddirection: '东南',
+            windpower: '≤3',
+            humidity: '45',
+            reporttime: new Date().toLocaleString(),
+          },
+        ],
+      }),
+    })
+  }),
+
+  http.post('/api/terminal/weather/future', async ({ request }) => {
+    const body = (await request.json()) as { city?: string; days?: string }
+    const city = body.city?.trim() || '北京'
+    const days = Math.max(1, Math.min(7, Number(body.days ?? 3) || 3))
+    const casts = Array.from({ length: days }, (_, index) => {
+      const date = new Date()
+      date.setDate(date.getDate() + index)
+      return {
+        date: date.toISOString().slice(0, 10),
+        week: String(((date.getDay() + 6) % 7) + 1),
+        dayweather: index % 2 === 0 ? '晴' : '多云',
+        nightweather: '晴',
+        daytemp_float: String(28 - index),
+        nighttemp_float: String(18 - index),
+      }
+    })
+    return HttpResponse.json({
+      code: 0,
+      data: JSON.stringify({
+        forecasts: [{ province: '模拟省', city, casts }],
+      }),
+    })
+  }),
+
+  http.post('/api/terminal/fanyi/translate', async ({ request }) => {
+    const body = (await request.json()) as {
+      keywords?: string
+      config?: { from?: string; to?: string }
+    }
+    const keywords = body.keywords?.trim() || ''
+    const dst = /[\u4e00-\u9fff]/.test(keywords)
+      ? `[EN] ${keywords}`
+      : `[中] ${keywords}`
+    return HttpResponse.json({
+      code: 0,
+      data: JSON.stringify({
+        from: body.config?.from ?? 'auto',
+        to: body.config?.to ?? 'auto',
+        trans_result: [{ src: keywords, dst }],
+      }),
+    })
+  }),
+
+  http.post('/api/terminal/music/get', async ({ request }) => {
+    const body = (await request.json()) as { keywords?: string }
+    const keywords = body.keywords?.trim() || 'demo'
+    return HttpResponse.json({
+      code: 0,
+      data: {
+        id: 1824020593,
+        name: keywords,
+      },
+    })
+  }),
+
+  http.post('/api/terminal/music/list/hot', () => {
+    return HttpResponse.json({
+      code: 0,
+      data: [
+        {
+          id: 1824020593,
+          al: {
+            name: '模拟热歌 1',
+            picUrl: 'https://p2.music.126.net/6y-UleORITEGaxINCqhQ1Q==/109951165671567156.jpg',
+          },
+        },
+        {
+          id: 1473765949,
+          al: {
+            name: '模拟热歌 2',
+            picUrl: 'https://p2.music.126.net/6y-UleORITEGaxINCqhQ1Q==/109951165671567156.jpg',
+          },
+        },
+        {
+          id: 1397345903,
+          al: {
+            name: '模拟热歌 3',
+            picUrl: 'https://p2.music.126.net/6y-UleORITEGaxINCqhQ1Q==/109951165671567156.jpg',
+          },
+        },
+      ],
+    })
+  }),
+
+  http.post('/api/terminal/background/get/random', async ({ request }) => {
+    const body = (await request.json()) as { lx?: string }
+    const lx = body.lx || 'fengjing'
+    const palette: Record<string, string> = {
+      meizi: 'linear-gradient(135deg, #be185d, #9d174d)',
+      dongman: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
+      fengjing: 'linear-gradient(135deg, #0c4a6e, #111827)',
+      suiji: 'linear-gradient(135deg, #0f172a, #1e293b)',
+    }
+    return HttpResponse.json({
+      code: 0,
+      data: palette[lx] ?? palette.fengjing,
+    })
+  }),
+
+  http.post('/api/terminal/log/user/:id', async ({ params, request }) => {
+    const body = (await request.json()) as { content?: string }
+    if (!body.content?.trim()) {
+      return HttpResponse.json({
+        code: -1,
+        message: '内容为空',
+        description: '请输入日志内容',
+      })
+    }
+    return HttpResponse.json({
+      code: 0,
+      data: {
+        id: params.id,
+        content: body.content,
+        createdAt: new Date().toISOString(),
+      },
+    })
+  }),
 ]
 

@@ -13,6 +13,7 @@ import { InterfacesPage } from '@/pages/interfaces'
 import { LoginPage } from '@/pages/login'
 import { RegisterPage } from '@/pages/register'
 import { SettingsPage } from '@/pages/settings'
+import { TerminalPage } from '@/pages/terminal'
 import { UsersPage } from '@/pages/users'
 
 export const router = createBrowserRouter([
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
   {
     element: <RequireAuth />,
     children: [
+      { path: '/terminal', element: <TerminalPage /> },
       {
         element: <AdminLayout />,
         children: [

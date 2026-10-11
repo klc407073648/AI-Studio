@@ -7,6 +7,7 @@ import {
   Settings,
   Settings2,
   SquareTerminal,
+  Terminal,
   Users,
   Waypoints,
   type LucideIcon,
@@ -207,6 +208,13 @@ export function AdminLayout() {
         to: '/interfaces',
         label: t('nav.interfaces'),
         icon: Waypoints,
+        end: false,
+      },
+      {
+        type: 'link',
+        to: '/terminal',
+        label: t('nav.terminal'),
+        icon: Terminal,
         end: false,
       },
       {
