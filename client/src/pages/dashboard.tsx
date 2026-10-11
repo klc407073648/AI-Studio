@@ -55,15 +55,19 @@ export function DashboardPage() {
             <CardDescription>{t('dashboard.quickLinksDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link to="/interfaces">{t('nav.interfaces')}</Link>
+            </Button>
             {user?.role === 'admin' ? (
-              <Button asChild>
-                <Link to="/users">{t('nav.users')}</Link>
-              </Button>
-            ) : (
-              <p className="text-muted-foreground text-sm">
-                {t('dashboard.noAdminAccess')}
-              </p>
-            )}
+              <>
+                <Button asChild variant="secondary">
+                  <Link to="/admin/apis">{t('nav.openApi')}</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/users">{t('nav.users')}</Link>
+                </Button>
+              </>
+            ) : null}
             <Button asChild variant="outline">
               <Link to="/settings">{t('nav.settings')}</Link>
             </Button>

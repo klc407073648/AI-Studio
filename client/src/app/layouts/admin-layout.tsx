@@ -1,14 +1,18 @@
 import {
+  ChevronDown,
   LayoutDashboard,
   LogOut,
   Menu,
   Search,
   Settings,
+  Settings2,
+  SquareTerminal,
   Users,
+  Waypoints,
   type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 
 import { AppBreadcrumb } from '@/components/app-breadcrumb'
 import { CommandMenu } from '@/components/command-menu'
@@ -32,7 +36,8 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUiStore } from '@/stores/ui-store'
 
-type NavItem = {
+type NavLinkItem = {
+  type: 'link'
   to: string
   label: string
   icon: LucideIcon
@@ -40,38 +45,141 @@ type NavItem = {
   adminOnly?: boolean
 }
 
-function NavItems({
-  items,
+type NavGroupItem = {
+  type: 'group'
+  label: string
+  icon: LucideIcon
+  adminOnly?: boolean
+  children: NavLinkItem[]
+}
+
+type NavEntry = NavLinkItem | NavGroupItem
+
+function NavLinkButton({
+  item,
   onNavigate,
 }: {
-  items: NavItem[]
+  item: NavLinkItem
+  onNavigate?: () => void
+}) {
+  return (
+    <NavLink
+      to={item.to}
+      end={item.end}
+      onClick={onNavigate}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+          isActive
+            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+            : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/70',
+        )
+      }
+    >
+      <item.icon className="size-4" />
+      {item.label}
+    </NavLink>
+  )
+}
+
+function NavGroup({
+  entry,
+  onNavigate,
+}: {
+  entry: NavGroupItem
+  onNavigate?: () => void
+}) {
+  const { pathname } = useLocation()
+  const childActive = entry.children.some(
+    (child) =>
+      pathname === child.to ||
+      (!child.end && pathname.startsWith(`${child.to}/`)),
+  )
+  const [open, setOpen] = useState(true)
+
+  useEffect(() => {
+    if (childActive) setOpen(true)
+  }, [childActive])
+
+  return (
+    <div className="mt-1">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className={cn(
+          'text-sidebar-foreground/80 hover:bg-sidebar-accent/70 flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+          childActive && 'text-sidebar-foreground font-medium',
+        )}
+        aria-expanded={open}
+      >
+        <entry.icon className="size-4 shrink-0" />
+        <span className="flex-1 text-left">{entry.label}</span>
+        <ChevronDown
+          className={cn(
+            'text-muted-foreground size-4 shrink-0 transition-transform',
+            !open && '-rotate-90',
+          )}
+        />
+      </button>
+      {open ? (
+        <div className="ml-5 border-l border-border/70 py-0.5 pl-3">
+          <div className="flex flex-col gap-0.5">
+            {entry.children.map((child) => (
+              <NavLink
+                key={child.to}
+                to={child.to}
+                end={child.end}
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors',
+                    isActive
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                      : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/70',
+                  )
+                }
+              >
+                <child.icon className="size-4 shrink-0" />
+                {child.label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function NavItems({
+  entries,
+  onNavigate,
+}: {
+  entries: NavEntry[]
   onNavigate?: () => void
 }) {
   const role = useAuthStore((state) => state.user?.role)
+  const isAdmin = role === 'admin'
 
   return (
     <nav className="flex flex-col gap-1 p-3">
-      {items
-        .filter((item) => !item.adminOnly || role === 'admin')
-        .map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
-                isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                  : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/70',
-              )
-            }
-          >
-            <item.icon className="size-4" />
-            {item.label}
-          </NavLink>
-        ))}
+      {entries.map((entry) => {
+        if (entry.type === 'link') {
+          if (entry.adminOnly && !isAdmin) return null
+          return (
+            <NavLinkButton
+              key={entry.to}
+              item={entry}
+              onNavigate={onNavigate}
+            />
+          )
+        }
+
+        if (entry.adminOnly && !isAdmin) return null
+
+        return (
+          <NavGroup key={entry.label} entry={entry} onNavigate={onNavigate} />
+        )
+      })}
     </nav>
   )
 }
@@ -85,17 +193,46 @@ export function AdminLayout() {
   const setSidebarOpen = useUiStore((state) => state.setSidebarOpen)
   const [commandOpen, setCommandOpen] = useState(false)
 
-  const navItems = useMemo<NavItem[]>(
+  const navEntries = useMemo<NavEntry[]>(
     () => [
-      { to: '/', label: t('nav.dashboard'), icon: LayoutDashboard, end: true },
       {
-        to: '/users',
-        label: t('nav.users'),
-        icon: Users,
-        end: false,
-        adminOnly: true,
+        type: 'link',
+        to: '/',
+        label: t('nav.dashboard'),
+        icon: LayoutDashboard,
+        end: true,
       },
       {
+        type: 'link',
+        to: '/interfaces',
+        label: t('nav.interfaces'),
+        icon: Waypoints,
+        end: false,
+      },
+      {
+        type: 'group',
+        label: t('nav.systemGroup'),
+        icon: Settings2,
+        adminOnly: true,
+        children: [
+          {
+            type: 'link',
+            to: '/users',
+            label: t('nav.usersShort'),
+            icon: Users,
+            end: false,
+          },
+          {
+            type: 'link',
+            to: '/admin/apis',
+            label: t('nav.openApi'),
+            icon: SquareTerminal,
+            end: false,
+          },
+        ],
+      },
+      {
+        type: 'link',
         to: '/settings',
         label: t('nav.settings'),
         icon: Settings,
@@ -142,7 +279,7 @@ export function AdminLayout() {
           <p className="text-muted-foreground text-xs">{t('app.subtitle')}</p>
         </div>
         <Separator />
-        <NavItems items={navItems} />
+        <NavItems entries={navEntries} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -160,7 +297,7 @@ export function AdminLayout() {
                   <p className="text-lg font-semibold">{t('app.name')}</p>
                 </div>
                 <Separator />
-                <NavItems items={navItems} />
+                <NavItems entries={navEntries} />
               </SheetContent>
             </Sheet>
             <Button
