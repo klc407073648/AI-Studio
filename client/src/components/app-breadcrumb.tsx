@@ -15,6 +15,8 @@ const routeLabels: Record<string, MessageKey> = {
   '/': 'nav.dashboard',
   '/users': 'nav.users',
   '/interfaces': 'nav.interfaces',
+  '/models': 'nav.models',
+  '/models/playground': 'models.playgroundTitle',
   '/admin/apis': 'nav.openApi',
   '/settings': 'nav.settings',
   '/403': 'forbidden.title',
@@ -55,6 +57,30 @@ export function AppBreadcrumb() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>{t('iface.detailTitle')}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    )
+  }
+
+  if (pathname === '/models/playground') {
+    return (
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">{t('breadcrumb.home')}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/models">{t('nav.models')}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{t('models.playgroundTitle')}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

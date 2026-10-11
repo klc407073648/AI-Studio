@@ -11,6 +11,8 @@ import { ForbiddenPage } from '@/pages/forbidden'
 import { InterfaceDetailPage } from '@/pages/interfaces/detail'
 import { InterfacesPage } from '@/pages/interfaces'
 import { LoginPage } from '@/pages/login'
+import { ModelsPage } from '@/pages/models'
+import { ModelPlaygroundPage } from '@/pages/models/playground'
 import { RegisterPage } from '@/pages/register'
 import { SettingsPage } from '@/pages/settings'
 import { TerminalPage } from '@/pages/terminal'
@@ -39,6 +41,8 @@ export const router = createBrowserRouter([
           { path: '/', element: <DashboardPage /> },
           { path: '/interfaces', element: <InterfacesPage /> },
           { path: '/interfaces/:id', element: <InterfaceDetailPage /> },
+          { path: '/models', element: <ModelsPage /> },
+          { path: '/models/playground', element: <ModelPlaygroundPage /> },
           { path: '/settings', element: <SettingsPage /> },
           { path: '/403', element: <ForbiddenPage /> },
           {

@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 
 import {
   interfacesDb,
+  modelsDb,
   nextInterfaceId,
   nextUserId,
   passwordsDb,
@@ -14,6 +15,7 @@ import type {
   InterfaceInfo,
   UpdateInterfacePayload,
 } from '@/types/interface'
+import type { ModelCapability, ModelModality } from '@/types/model-service'
 import type { CreateUserPayload, UpdateUserPayload, User } from '@/types/user'
 
 function getToken(request: Request) {
@@ -266,6 +268,38 @@ export const handlers = [
     }
 
     return HttpResponse.json(updated)
+  }),
+
+  // --- Model services ---
+
+  http.get('/api/models', ({ request }) => {
+    const result = requireAuth(request)
+    if ('error' in result) return result.error
+
+    const url = new URL(request.url)
+    const idsParam = url.searchParams.get('ids')
+    if (idsParam) {
+      const idSet = new Set(
+        idsParam
+          .split(',')
+          .map((id) => id.trim())
+          .filter(Boolean),
+      )
+      return HttpResponse.json(modelsDb.filter((item) => idSet.has(item.id)))
+    }
+
+    const modality = url.searchParams.get('modality') as ModelModality | null
+    const capability = url.searchParams.get(
+      'capability',
+    ) as ModelCapability | null
+
+    const filtered = modelsDb.filter((item) => {
+      if (modality && item.modality !== modality) return false
+      if (capability && !item.capabilities.includes(capability)) return false
+      return true
+    })
+
+    return HttpResponse.json(filtered)
   }),
 
   // --- InterfaceInfo（对齐 openApi 业务能力，路径按本项目 REST 风格） ---

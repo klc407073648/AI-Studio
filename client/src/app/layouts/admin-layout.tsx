@@ -1,4 +1,5 @@
 import {
+  Bot,
   ChevronDown,
   LayoutDashboard,
   LogOut,
@@ -208,6 +209,13 @@ export function AdminLayout() {
         to: '/interfaces',
         label: t('nav.interfaces'),
         icon: Waypoints,
+        end: false,
+      },
+      {
+        type: 'link',
+        to: '/models',
+        label: t('nav.models'),
+        icon: Bot,
         end: false,
       },
       {

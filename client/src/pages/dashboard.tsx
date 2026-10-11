@@ -59,6 +59,9 @@ export function DashboardPage() {
               <Link to="/interfaces">{t('nav.interfaces')}</Link>
             </Button>
             <Button asChild variant="secondary">
+              <Link to="/models">{t('nav.models')}</Link>
+            </Button>
+            <Button asChild variant="secondary">
               <Link to="/terminal">{t('nav.terminal')}</Link>
             </Button>
             {user?.role === 'admin' ? (

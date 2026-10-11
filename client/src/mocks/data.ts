@@ -1,4 +1,5 @@
 import type { InterfaceInfo } from '@/types/interface'
+import type { ModelService } from '@/types/model-service'
 import type { User } from '@/types/user'
 
 export const seedUsers: User[] = [
@@ -121,14 +122,203 @@ export const seedInterfaces: InterfaceInfo[] = [
   },
 ]
 
+export const seedModels: ModelService[] = [
+  {
+    id: 'text-ds-flash',
+    name: 'DeepSeek-V4.1-Flash',
+    modality: 'text',
+    provider: '深度求索',
+    description:
+      '轻量极速文本模型，适合对话、摘要与日常助手场景，延迟低、性价比高。',
+    capabilities: [
+      'popular',
+      'textGen',
+      'functionCall',
+      'json',
+      'longContext',
+      'zh',
+      'en',
+      'webSearch',
+    ],
+    tags: ['文本生成', 'Function Call', 'JSON', '>128k', '中文', '英文'],
+    updatedAt: '2026-03-25 15:41:23',
+    logoKey: 'DS',
+  },
+  {
+    id: 'text-ds-pro',
+    name: 'DeepSeek-V4-Pro',
+    modality: 'text',
+    provider: '深度求索',
+    description:
+      '旗舰推理模型，强化复杂推理、代码与长文档理解，适合高质量生成任务。',
+    capabilities: [
+      'popular',
+      'textGen',
+      'functionCall',
+      'json',
+      'prefix',
+      'fim',
+      'longContext',
+      'zh',
+      'en',
+      'persona',
+    ],
+    tags: ['文本生成', 'Function Call', 'Prefix', 'FIM', '>128k', '中文', '英文'],
+    updatedAt: '2026-03-25 15:41:23',
+    logoKey: 'DS',
+  },
+  {
+    id: 'text-ernie',
+    name: 'ERNIE-5.1',
+    modality: 'text',
+    provider: '百度',
+    description:
+      '中文增强大模型，擅长中文创作、知识问答与企业助手，支持人设与千帆能力。',
+    capabilities: [
+      'popular',
+      'textGen',
+      'functionCall',
+      'json',
+      'zh',
+      'en',
+      'persona',
+      'chineseEnhance',
+      'webSearch',
+    ],
+    tags: ['文本生成', 'Function Call', 'JSON', '中文', '英文'],
+    updatedAt: '2026-03-25 15:41:23',
+    logoKey: 'ER',
+  },
+  {
+    id: 'text-qwen',
+    name: 'Qwen3-Max',
+    modality: 'text',
+    provider: '通义',
+    description: '通用多语言文本模型，兼顾工具调用与长上下文，适合业务编排。',
+    capabilities: [
+      'textGen',
+      'functionCall',
+      'json',
+      'longContext',
+      'zh',
+      'en',
+      'webSearch',
+    ],
+    tags: ['文本生成', 'Function Call', 'JSON', '>128k', '中文', '英文'],
+    updatedAt: '2026-03-20 10:12:00',
+    logoKey: 'QW',
+  },
+  {
+    id: 'img-sdxl',
+    name: 'Image-Studio XL',
+    modality: 'image',
+    provider: 'AI Studio',
+    description: '高清文生图模型，支持风格控制与批量出图，适合设计草稿。',
+    capabilities: ['popular', 'text2img', 'zh', 'en'],
+    tags: ['文生图', '高清', '中文', '英文'],
+    updatedAt: '2026-03-18 09:00:00',
+    logoKey: 'IX',
+  },
+  {
+    id: 'img-edit',
+    name: 'Image-Edit Pro',
+    modality: 'image',
+    provider: 'AI Studio',
+    description: '图生图与局部重绘，适合产品图修图与风格迁移。',
+    capabilities: ['img2img', 'vision', 'zh'],
+    tags: ['图生图', '局部重绘', '中文'],
+    updatedAt: '2026-03-15 14:22:00',
+    logoKey: 'IE',
+  },
+  {
+    id: 'img-vision',
+    name: 'Vision-Understand',
+    modality: 'image',
+    provider: '通义',
+    description: '图像理解与描述，可结合文本指令做多模态问答。',
+    capabilities: ['popular', 'vision', 'zh', 'en'],
+    tags: ['图像理解', '多模态', '中文', '英文'],
+    updatedAt: '2026-03-12 11:30:00',
+    logoKey: 'VU',
+  },
+  {
+    id: 'vid-gen',
+    name: 'Video-Gen 2.0',
+    modality: 'video',
+    provider: 'AI Studio',
+    description: '文生短视频，支持镜头脚本与基础运镜控制。',
+    capabilities: ['popular', 'text2video', 'zh', 'en'],
+    tags: ['文生视频', '短视频', '中文', '英文'],
+    updatedAt: '2026-03-10 16:00:00',
+    logoKey: 'VG',
+  },
+  {
+    id: 'vid-img2vid',
+    name: 'Image-to-Video',
+    modality: 'video',
+    provider: '深度求索',
+    description: '静态图驱动生成短视频，适合产品动效演示。',
+    capabilities: ['img2video', 'zh'],
+    tags: ['图生视频', '动效', '中文'],
+    updatedAt: '2026-03-08 08:45:00',
+    logoKey: 'IV',
+  },
+  {
+    id: 'vid-story',
+    name: 'Storyboard Video',
+    modality: 'video',
+    provider: '百度',
+    description: '分镜式视频生成，强调叙事连贯与角色一致性。',
+    capabilities: ['popular', 'text2video', 'zh'],
+    tags: ['文生视频', '分镜', '中文'],
+    updatedAt: '2026-03-05 19:20:00',
+    logoKey: 'SV',
+  },
+  {
+    id: 'aud-asr',
+    name: 'Speech-ASR Ultra',
+    modality: 'audio',
+    provider: 'AI Studio',
+    description: '高准确率语音转写，支持中英混合与标点恢复。',
+    capabilities: ['popular', 'asr', 'zh', 'en'],
+    tags: ['语音识别', '中英混合', '标点'],
+    updatedAt: '2026-03-22 12:00:00',
+    logoKey: 'ASR',
+  },
+  {
+    id: 'aud-tts',
+    name: 'Speech-TTS Natural',
+    modality: 'audio',
+    provider: '百度',
+    description: '自然语音合成，多音色与情感风格可选。',
+    capabilities: ['popular', 'tts', 'zh', 'en'],
+    tags: ['语音合成', '多音色', '中文', '英文'],
+    updatedAt: '2026-03-19 10:10:00',
+    logoKey: 'TTS',
+  },
+  {
+    id: 'aud-music',
+    name: 'Music-Compose Lite',
+    modality: 'audio',
+    provider: '通义',
+    description: '文本驱动短音乐生成，适合片头与氛围音轨。',
+    capabilities: ['music', 'zh', 'en'],
+    tags: ['音乐生成', '短曲', '中文', '英文'],
+    updatedAt: '2026-03-11 17:55:00',
+    logoKey: 'MC',
+  },
+]
+
 export let usersDb = structuredClone(seedUsers)
 export let passwordsDb = { ...seedPasswords }
 export let interfacesDb = structuredClone(seedInterfaces)
+export let modelsDb = structuredClone(seedModels)
 
 export function resetMockDb() {
   usersDb = structuredClone(seedUsers)
   passwordsDb = { ...seedPasswords }
   interfacesDb = structuredClone(seedInterfaces)
+  modelsDb = structuredClone(seedModels)
 }
 
 export function nextUserId() {

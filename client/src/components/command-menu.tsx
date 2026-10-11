@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
+  Bot,
   LayoutDashboard,
   Settings,
   SquareTerminal,
@@ -95,6 +96,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           to: '/interfaces',
           label: t('nav.interfaces'),
           icon: Waypoints,
+        },
+        {
+          to: '/models',
+          label: t('nav.models'),
+          icon: Bot,
         },
         {
           to: '/terminal',
