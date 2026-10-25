@@ -62,15 +62,7 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('users.title')}
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {t('users.subtitle')}
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button onClick={openCreate}>{t('users.create')}</Button>
       </div>
 

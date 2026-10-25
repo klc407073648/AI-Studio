@@ -21,15 +21,7 @@ export function ModelPlaygroundPage() {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {t('models.playgroundTitle')}
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {t('models.playgroundSubtitle')}
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button asChild variant="outline" size="sm">
           <Link to="/models">
             <ArrowLeft className="size-4" />

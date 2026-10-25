@@ -1,4 +1,4 @@
-import { Languages } from 'lucide-react'
+import { Globe } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -17,12 +17,19 @@ const options: { value: Locale; label: string }[] = [
 
 export function LanguageSwitcher() {
   const { t, locale, setLocale } = useI18n()
+  const currentLabel =
+    options.find((option) => option.value === locale)?.label ?? options[0].label
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t('header.language')}>
-          <Languages className="size-4" />
+        <Button
+          variant="ghost"
+          className="gap-1.5 px-2"
+          aria-label={t('header.language')}
+        >
+          <Globe className="size-4 shrink-0" />
+          <span className="text-sm font-normal">{currentLabel}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

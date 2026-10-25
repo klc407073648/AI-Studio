@@ -22,6 +22,7 @@ import {
 import { fetchInterfaces } from '@/features/interfaces/api'
 import { fetchUsers } from '@/features/users/api'
 import { useI18n } from '@/hooks/use-i18n'
+import { matchByPinyin } from '@/lib/pinyin-match'
 import { useAuthStore } from '@/stores/auth-store'
 import type { InterfaceInfo } from '@/types/interface'
 import type { User } from '@/types/user'
@@ -151,6 +152,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       onOpenChange={handleOpenChange}
       title={t('command.title')}
       description={t('command.placeholder')}
+      filter={matchByPinyin}
     >
       <CommandInput
         placeholder={t('command.placeholder')}

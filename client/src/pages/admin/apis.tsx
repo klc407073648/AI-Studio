@@ -30,15 +30,6 @@ export function AdminApisPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('iface.openApiTitle')}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t('iface.openApiSubtitle')}
-        </p>
-      </div>
-
       <div className="flex gap-1 border-b">
         <Button
           type="button"

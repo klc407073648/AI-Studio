@@ -64,15 +64,6 @@ export function InterfacesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('iface.plazaTitle')}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t('iface.plazaSubtitle')}
-        </p>
-      </div>
-
       <form onSubmit={applySearch} className="flex flex-col gap-2 sm:flex-row">
         <Input
           value={keyword}

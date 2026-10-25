@@ -17,14 +17,9 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t('dashboard.title')}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t('dashboard.welcome', { name: user?.name ?? '' })}
-        </p>
-      </div>
+      <p className="text-muted-foreground text-sm">
+        {t('dashboard.welcome', { name: user?.name ?? '' })}
+      </p>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
